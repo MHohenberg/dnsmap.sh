@@ -19,7 +19,7 @@ white="\033[1;37m";
 yellow="\033[0;33m";
 
 # Globals 
-version="0.1"
+version="0.2"
 
 dnsmap_usage() {
 
@@ -58,8 +58,9 @@ dnsmap_fail() {
 }
 
 dnsmap_check_dep() {
-  if [ ! -x /bin/dig ];then 
-    dnsmap_fail "please install bind-tools. (dig)"
+  command -v dig >/dev/null 2>&1
+  if [ $? -ne 0  ];then 
+    dnsmap_fail "please install bind-tools or dnsutils (dig)."
   fi
 }
 
@@ -72,14 +73,22 @@ dnsmap() {
   fi
 
   count=$(cat $2| wc -l)
-  dnsmap_info "Starting dnsmap.sh ${version} - testing ${green}${count}${reset} domains ..."
+  dnsmap_info "Starting dnsmap.sh ${version} - testing ${green}${count}${reset} sub-domains ..."
+  printf "#\n# dnsmap.sh ${version} - $(date +"%T %d/%m/%y %z")\n#\n" > "${1}.txt"
 
   for x in $(cat $2);do 
     domain="${x}.${1}"
     o=$(dig $domain "${@:4}" | grep "${domain}" | awk 'NR==3{print $0}')
     if [ ! -z "$o" ];then
-      printf "${green}[+]${reset} ${o}" && echo
+      # save output
+      echo "${o}" | awk '{printf("%s %s\n", $1, $5)}' >> "${1}.txt"
+      if [[ "$o" == *"google.com"* ]];then
+	printf "${green}[+]${reset} ${o} - ${yellow}(Google service)${reset}" && echo
+      else
+	printf "${green}[+]${reset} ${o}" && echo
+      fi
       match=$((match + 1))
+      sleep 0.20
     fi
   done
   

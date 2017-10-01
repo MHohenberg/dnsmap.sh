@@ -38,9 +38,11 @@ Examples:
 
 ```
 
+The output will be saved in: `"domain_name.txt"`
+
 # Thanks
 
-Daniel Miessler - [Seclists](https://github.com/danielmiessler/SecLists) repositiroy for the word list.
+Daniel Miessler - [Seclists](https://github.com/danielmiessler/SecLists) repositiroy.
 
 # Copying
 
